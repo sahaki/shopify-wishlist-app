@@ -1,0 +1,29 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "f997bb5b3838d37a438cc44f5a40812f"
+name = "radar-wishlist-app"
+handle = "radar-wishlist-app"
+application_url = "https://surge-seller-lazy-arthur.trycloudflare.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "boyd-dev-store.myshopify.com"
+include_config_on_deploy = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = ""
+
+[auth]
+redirect_urls = [
+  "https://surge-seller-lazy-arthur.trycloudflare.com/auth/callback",
+  "https://surge-seller-lazy-arthur.trycloudflare.com/auth/shopify/callback",
+  "https://surge-seller-lazy-arthur.trycloudflare.com/api/auth/callback"
+]
+
+[webhooks]
+api_version = "2024-07"
+
+[pos]
+embedded = false
