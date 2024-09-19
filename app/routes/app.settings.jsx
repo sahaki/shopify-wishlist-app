@@ -12,6 +12,7 @@ import { TitleBar } from "@shopify/app-bridge-react";
 import { useState } from 'react'
 import { json } from "@remix-run/node";
 import { useLoaderData, Form } from "@remix-run/react";
+import db from "../db.server";
 
 export async function loader() {
   // get data from data from database
@@ -20,6 +21,20 @@ export async function loader() {
     description: "App Description"
   }
 
+  settings.name = await db.settings.findUnique({
+    where: {
+      id: '1',
+    },
+  })
+  settings.name = settings.name.config_value;
+
+  settings.description = await db.settings.findUnique({
+    where: {
+      id: '2',
+    },
+  })
+  settings.description = settings.description.config_value;
+
   return json(settings)
 }
  
@@ -27,16 +42,30 @@ export async function action({request}) {
   // updates persistent data
   let settings = await request.formData();
   settings = Object.fromEntries(settings)
+
+  const configUpdates = [
+    { id: '1', config_path: 'app_name', config_value: settings.name },
+    { id: '2', config_path: 'app_description', config_value: settings.description },
+  ];
+
+  // Batch upsert operations
+  const upsertPromises = configUpdates.map((config) =>
+    db.settings.upsert({
+      where: { id: config.id },
+      update: config,
+      create: config,
+    })
+  );
+
+  // Await all upserts concurrently
+  await Promise.all(upsertPromises);
+  
   return json(settings)
 }
 
 export default function SettingsPage() {
   const settings = useLoaderData();
   const [formState, setFormState] = useState(settings);
-
-  const submitForm = () =>{
-    alert('Hello world')
-  }
 
   return (
     <Page>

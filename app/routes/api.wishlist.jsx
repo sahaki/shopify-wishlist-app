@@ -15,5 +15,5 @@ export async function action({request}) {
             return json({method: method, message: "Success"})
         default:
             return new Response("Method Not Allowed", {status: 405})
-    }
+    } 
 }
