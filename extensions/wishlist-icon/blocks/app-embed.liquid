@@ -1,0 +1,111 @@
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<div x-data="wishlistData">
+  {% for product in collections.all.products %}
+    {{  product.id }}
+  {% endfor %}
+</div>
+
+<script>
+
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('wishlistData', () => ({
+        wishlist: [],
+        appUrl: "https://sensitivity-synopsis-radical-advice.trycloudflare.com",
+        init(){
+          fetch(this.appUrl + "/api/wishlist"+"?customerId={{ customer.id }}&shop={{ shop.permanent_domain }}")
+              .then(response => response.json())
+              .then(result => {
+                  if(result.data.length > 0){
+                    this.wishlist = result.data; 
+                  }
+              })
+              .catch(error => console.log('error', error));
+        }
+    }))
+  })
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Create a new anchor element for the wishlist
+    var wishlistButton = document.createElement('div');
+    wishlistButton.className = "icon_wishlist";
+    wishlistButton.id = "wishlistToggle";
+
+    // Create the SVG element
+    var svgNS = "http://www.w3.org/2000/svg"; // SVG namespace
+    var svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("class", "wishlist-inspire__icon--svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("stroke-width", "2");
+    svg.setAttribute("stroke", "#F00");
+    svg.setAttribute("fill", "#F00");
+
+    var path = document.createElementNS(svgNS, "path");
+    path.setAttribute("d", "M12 21.35l-1.45-1.32C5.4 15.73 2 12.27 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.77-3.4 7.23-8.55 11.53L12 21.35z");
+    svg.appendChild(path);
+    wishlistButton.appendChild(svg);
+    document.body.appendChild(wishlistButton);
+
+    // Inject the wishlist panel div
+    var wishlistPanel = document.createElement('div');
+    wishlistPanel.id = "wishlistPanel";
+    wishlistPanel.className = "wishlist-panel";
+    //wishlistPanel.setAttribute('x-data', 'wishlistData');
+    let html = `{{ "XIcon.svg" | asset_url | img_tag: 'image alt text', 'close-wishlist-panel', '24x24' }}`;
+    html += `<div class="wishlist-item"></div>`;
+
+    wishlistPanel.innerHTML = html; // Content for the wishlist panel
+
+    // Append the wishlist panel to the body or desired container
+    document.body.appendChild(wishlistPanel);
+
+    // Toggle functionality for wishlist panel
+    var toggleButton = document.getElementById('wishlistToggle');
+
+    toggleButton.addEventListener('click', function (event) {
+      event.preventDefault(); // Prevent default anchor behavior
+      wishlistPanel.classList.toggle('visible');
+    });
+  })
+</script>
+
+<style>
+  .icon_wishlist{
+    position: fixed;
+    bottom: 120px;
+    right: 0;
+    z-index: 10;
+    cursor: pointer;
+    padding: 10px;
+    display: flex;
+    border: 1px solid;
+  }
+  .icon_wishlist svg{
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+  }
+  .wishlist-panel {
+    position: fixed;
+    z-index: 10;
+    top: 0;
+    padding: 25px;
+    right: -500px; /* Hidden off-screen initially */
+    width: 500px;
+    height: 100%;
+    background-color: white; /* Adjust to your preference */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+    transition: right 0.5s ease; /* Smooth transition */
+  }
+  
+  .wishlist-panel.visible {
+    right: 0; /* Slide in */
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Wishlist icon & list",
+  "target": "body",
+  "settings": []
+}
+{% endschema %}
