@@ -3,7 +3,7 @@
 client_id = "f997bb5b3838d37a438cc44f5a40812f"
 name = "radar-wishlist-app"
 handle = "radar-wishlist-app"
-application_url = "https://thru-inf-act-tells.trycloudflare.com"
+application_url = "https://logical-clarity-char-thing.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = ""
 
 [auth]
 redirect_urls = [
-  "https://thru-inf-act-tells.trycloudflare.com/auth/callback",
-  "https://thru-inf-act-tells.trycloudflare.com/auth/shopify/callback",
-  "https://thru-inf-act-tells.trycloudflare.com/api/auth/callback"
+  "https://logical-clarity-char-thing.trycloudflare.com/auth/callback",
+  "https://logical-clarity-char-thing.trycloudflare.com/auth/shopify/callback",
+  "https://logical-clarity-char-thing.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

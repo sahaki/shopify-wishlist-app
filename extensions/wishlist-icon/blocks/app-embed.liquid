@@ -1,25 +1,40 @@
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-<div x-data="wishlistData">
-  {% for product in collections.all.products %}
-    {{  product.id }}
-  {% endfor %}
-</div>
-
 <script>
-
   document.addEventListener('alpine:init', () => {
     Alpine.data('wishlistData', () => ({
         wishlist: [],
-        appUrl: "https://sensitivity-synopsis-radical-advice.trycloudflare.com",
+        products: [],
+        appUrl: "https://logical-clarity-char-thing.trycloudflare.com",
         init(){
           fetch(this.appUrl + "/api/wishlist"+"?customerId={{ customer.id }}&shop={{ shop.permanent_domain }}")
               .then(response => response.json())
               .then(result => {
                   if(result.data.length > 0){
-                    this.wishlist = result.data; 
+                    result.data.forEach(item => {
+                      this.wishlist = result.data.map(item => Number(item.productId));
+                    });
+                    this.fetchProducts();
                   }
               })
               .catch(error => console.log('error', error));
+        },
+        fetchProducts() {
+          // Fetch all products from the Liquid-rendered data
+          this.products = [
+            {% for product in collections.all.products %}
+              { 
+                id: {{ product.id }}, 
+                title: "{{ product.title }}", 
+                price: "{{ product.price | money }}",
+                featured_image : "{{ product.featured_image | img_url: 'medium' }}",
+                url: "{{ product.url }}"
+              }, 
+          {% endfor %}];
+        },
+  
+        get filteredProducts() {
+          // Return only the products that are in the wishlist
+          return this.products.filter(product => this.wishlist.includes(product.id));
         }
     }))
   })
@@ -49,9 +64,22 @@
     var wishlistPanel = document.createElement('div');
     wishlistPanel.id = "wishlistPanel";
     wishlistPanel.className = "wishlist-panel";
-    //wishlistPanel.setAttribute('x-data', 'wishlistData');
+    wishlistPanel.setAttribute('x-data', 'wishlistData');
     let html = `{{ "XIcon.svg" | asset_url | img_tag: 'image alt text', 'close-wishlist-panel', '24x24' }}`;
-    html += `<div class="wishlist-item"></div>`;
+    html += `<div x-data="wishlistData" x-init="init">
+    <ul>
+      <template x-for="product in filteredProducts" :key="product.id">
+        <li>
+          <div class="item-list">
+            <a :href="product.url">
+              <img x-bind:src="product.featured_image" x-bind:alt="product.title" />
+              <span x-text="product.title"></span> - <span x-text="product.price"></span>
+            </a>
+          </div>
+        </li>
+      </template>
+    </ul>
+  </div>`;
 
     wishlistPanel.innerHTML = html; // Content for the wishlist panel
 
@@ -60,8 +88,14 @@
 
     // Toggle functionality for wishlist panel
     var toggleButton = document.getElementById('wishlistToggle');
+    var closeWishlist = document.getElementsByClassName('close-wishlist-panel');
+    console.log(closeWishlist)
 
     toggleButton.addEventListener('click', function (event) {
+      event.preventDefault(); // Prevent default anchor behavior
+      wishlistPanel.classList.toggle('visible');
+    });
+    closeWishlist[0].addEventListener('click', function (event) {
       event.preventDefault(); // Prevent default anchor behavior
       wishlistPanel.classList.toggle('visible');
     });
@@ -89,16 +123,31 @@
     z-index: 10;
     top: 0;
     padding: 25px;
-    right: -500px; /* Hidden off-screen initially */
+    right: -500px;
     width: 500px;
     height: 100%;
-    background-color: white; /* Adjust to your preference */
+    background-color: white;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-    transition: right 0.5s ease; /* Smooth transition */
+    transition: right 0.5s ease;
+    display: flex;
+    flex-wrap: wrap;
   }
-  
   .wishlist-panel.visible {
     right: 0; /* Slide in */
+  }
+
+  .close-wishlist-panel{
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.3);
+    -webkit-box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.3);
+    -moz-box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.3);
+    float: right;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    cursor: pointer;
   }
 </style>
 

@@ -11,7 +11,7 @@
     document.addEventListener('alpine:init', () => {
         Alpine.data('wishlist', () => ({
             wishlisted: false,
-            appUrl: "https://sensitivity-synopsis-radical-advice.trycloudflare.com",
+            appUrl: "https://logical-clarity-char-thing.trycloudflare.com",
             init(){
               fetch(this.appUrl + "/api/wishlist"+"?customerId={{ customer.id }}&productId={{ product.id }}&shop={{ shop.permanent_domain }}")
                   .then(response => response.json())
